@@ -3,6 +3,8 @@ import json
 from typing import Union
 import datetime
 
+from .utils import get_scope_list_from_string
+
 
 class API(object):
     """Represents a connection to Twitch's Helix API.
@@ -10,7 +12,7 @@ class API(object):
     Attributes:
         client_id (str): Twitch Client ID.
         client_secret (str): Twitch Client Secret.
-        oauth_token (str, optional): User oauth token for requests needing oauth.
+        oauth_token (str, optional): User oauth token.
 
     """
 
@@ -18,7 +20,7 @@ class API(object):
         self, client_id: str = None, client_secret: str = None, oauth_token: str = None
     ):
 
-        if client_id is None or client_secret is None and oauth_token is None:
+        if (client_id is None or client_secret is None) and oauth_token is None:
             raise TypeError(
                 "You must provide both 'client_id' and 'client_secret' args or a valid oauth token."
             )
@@ -27,7 +29,7 @@ class API(object):
         self.client_secret: str = client_secret
         self.oauth_token: str = oauth_token
         self.refresh_token: str = None
-        self.scope: str = None
+        self.scopes: list = None
         self.token_expiration: datetime.datetime = None
 
         # all base urls should exclude trailing slash
@@ -75,19 +77,26 @@ class API(object):
             response.raise_for_status()
 
     def _authenticate(self) -> bool:
+        # if user supplies only an oauth token, infer the client_id
+        # from the token validation response
+        if self.client_id is None and self.oauth_token is not None:
+            validated_tokens = self._get_validated_tokens(self.oauth_token)
+            self.client_id = validated_tokens["client_id"]
+
         tokens = self._get_oauth_tokens(self.client_id, self.client_secret)
 
         # oauth_token needs to be set before validation in order
         # for the authorization header to get set in _set_headers()
         # invalidate the token if validation fails
         self.oauth_token = tokens["access_token"]
-        validated_tokens = self._validate_token(tokens["access_token"])
+        validated_tokens = self._get_validated_tokens(tokens["access_token"])
 
         try:
             if validated_tokens["client_id"] == self.client_id:
+
                 self.oauth_token = tokens["access_token"]
                 self.refresh_token = tokens["refresh_token"]
-                self.scope = tokens["scope"]
+                self.scopes = get_scope_list_from_string(validated_tokens["scope"])
                 self._set_token_expiration(tokens["expires_in"])
                 return True
             else:
@@ -99,7 +108,8 @@ class API(object):
 
     def _get_oauth_tokens(self, client_id: str, client_secret: str) -> dict:
         if self.oauth_token is not None:
-            return self.oauth_token
+            # return a dict that resembles a token response from twitch
+            return {"access_token": self.oauth_token}
 
         payload = {
             "grant_type": "client_credentials",
@@ -112,7 +122,7 @@ class API(object):
         if "access_token" in data:
             return data
 
-    def _validate_token(self, token: str) -> dict:
+    def _get_validated_tokens(self, token: str) -> dict:
         return self._request(url=self._token_validation_url)
 
     def _set_token_expiration(self, token_expires_in: int) -> None:
@@ -123,13 +133,35 @@ class API(object):
     def get_users(
         self, user_id: Union[str, list] = None, login: Union[str, list] = None
     ) -> list:
+        """Gets information about one or more specified Twitch users.
+
+        Note:
+            If authenticating as a user, provide no args to get authenticated user.
+
+        Args:
+            user_id (str, list, optional): User ID. Multiple user IDs can be specified. Limit: 100.
+            login (str, list, optional): User login name. Multiple login names can be specified. Limit: 100.
+
+        Returns:
+            list: List containing user-information elements.
+
+        """
+
         params = {}
+
         if user_id is not None:
             params["id"] = user_id
-        elif login is not None:
+        if login is not None:
             params["login"] = login
-        else:
-            raise ValueError("'user_id' or 'user_login' argument required.")
+
+        if user_id is None and login is None:
+            validated_tokens = self._get_validated_tokens(self.oauth_token)
+            if "login" in validated_tokens:
+                self.get_users(login=validated_tokens["login"])
+            else:
+                raise ValueError(
+                    "You must provide 'user_id', 'login', or authenticate with a user token."
+                )
 
         data = self._request("users", params=params)
         return data["data"]
