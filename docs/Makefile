@@ -8,7 +8,7 @@ PAPER         =
 BUILDDIR      = ../build/sphinx/
 AUTODOCDIR    = api
 AUTODOCBUILD  = sphinx-apidoc
-PROJECT       = twitch-helix
+PROJECT       = pytwitch
 MODULEDIR     = ../src/twitch_helix
 
 # User-friendly check for sphinx-build

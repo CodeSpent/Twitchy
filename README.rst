@@ -1,5 +1,5 @@
 ============
-twitch-helix
+pytwitch
 ============
 
 

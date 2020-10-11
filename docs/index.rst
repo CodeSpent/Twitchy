@@ -1,8 +1,8 @@
 ============
-twitch-helix
+pytwitch
 ============
 
-This is the documentation of **twitch-helix**.
+This is the documentation of **pytwitch**.
 
 .. note::
 
