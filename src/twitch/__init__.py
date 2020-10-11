@@ -5,7 +5,7 @@ from .api import API
 
 try:
     # Change here if project is renamed and does not equal the package name
-    dist_name = "twitch-helix"
+    dist_name = "pytwitch"
     __version__ = get_distribution(dist_name).version
 except DistributionNotFound:
     __version__ = "unknown"

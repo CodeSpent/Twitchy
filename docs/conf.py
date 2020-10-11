@@ -90,7 +90,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"twitch-helix"
+project = u"pytwitch"
 copyright = u"2020, Patrick Hanford"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -239,13 +239,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    (
-        "index",
-        "user_guide.tex",
-        u"twitch-helix Documentation",
-        u"Patrick Hanford",
-        "manual",
-    )
+    ("index", "user_guide.tex", u"pytwitch Documentation", u"Patrick Hanford", "manual")
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
