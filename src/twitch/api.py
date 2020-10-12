@@ -57,8 +57,15 @@ class Helix(object):
         if login is not None:
             params["login"] = login
 
-        if user_id is None and login is None:
-            validated_tokens = self._get_validated_tokens(self.oauth_token)
+        if user_id is None and login is None and self.oauth_token is not None:
+            validated_tokens = API(
+                client_id=self.client_id,
+                client_secret=self.client_secret,
+                oauth_token=self.oauth_token,
+                resource=User,
+                path=None,
+            )._get_validated_tokens()
+
             if "login" in validated_tokens:
                 self.get_users(login=validated_tokens["login"])
             else:
@@ -66,5 +73,10 @@ class Helix(object):
                     "You must provide 'user_id', 'login', or authenticate with a user token."
                 )
         return API(
-            self.client_id, self.client_secret, "users", User, params=params
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="users",
+            resource=User,
+            params=params,
         ).get()
