@@ -30,7 +30,7 @@ class TwitchAPIMixin(object):
             self._oauth_token = tokens["access_token"]
             self._token_expiration = tokens["expires_in"]
 
-        if self._oauth_token:
+        if self._oauth_token and use_oauth is True:
             headers["Authorization"] = f"Bearer {self._oauth_token}"
         return headers
 
@@ -45,6 +45,9 @@ class TwitchAPIMixin(object):
         response["expires_in"] = int(time.time()) + response["expires_in"]
         return response
 
+    def _get_validated_tokens(self):
+        return self._request(base_url=TOKEN_VALIDATION_URL)
+
     def _request(
         self, path=None, base_url=BASE_HELIX_URL, params={}, data={}, method="get"
     ):
@@ -52,7 +55,8 @@ class TwitchAPIMixin(object):
 
         # recursion issue when making a request to get oauth tokens
         # set 'use_oauth' to False for authentication calls
-        use_oauth = base_url not in [BASE_AUTH_URL, TOKEN_VALIDATION_URL]
+        use_oauth = base_url != BASE_AUTH_URL
+
         headers = self._get_request_headers(use_oauth=use_oauth)
 
         self._wait_for_rate_limit_reset()
@@ -80,10 +84,10 @@ class TwitchAPIMixin(object):
 class API(TwitchAPIMixin):
     def __init__(
         self,
-        client_id,
-        client_secret,
-        path,
-        resource,
+        client_id=None,
+        client_secret=None,
+        path=None,
+        resource=None,
         params={},
         data=None,
         oauth_token=None,
