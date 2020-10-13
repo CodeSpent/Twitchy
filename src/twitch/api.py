@@ -111,7 +111,7 @@ class Helix(object):
             user_id (str, optional): User ID. Limit: 1.
 
         Returns:
-            list: List containing Cheermote objects.
+            list: List containing Twitch Cheermote objects.
 
         """
         params = {}
