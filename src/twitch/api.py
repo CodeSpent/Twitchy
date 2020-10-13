@@ -81,7 +81,7 @@ class Helix(object):
             params=params,
         ).get()
 
-    def get_cheermotes(self, user_id: str = None):
+    def get_cheermotes(self, user_id: str = None) -> list:
         """Retrieves the list of available Cheermotes, animated emotes to which viewers can assign Bits, to cheer in chat..
 
         Note:
