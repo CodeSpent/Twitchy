@@ -129,7 +129,7 @@ class Helix(object):
             )._get_validated_tokens()
 
             if "login" in validated_tokens:
-                user = self.get_users(login=validated_tokens["login"])[0]
+                user = self.get_users(user_logins=validated_tokens["login"])[0]
                 self.get_cheermotes(user_id=user.id)
 
         return API(
