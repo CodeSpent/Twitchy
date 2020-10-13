@@ -3,6 +3,7 @@ import requests
 from requests.compat import urljoin
 
 from .constants import BASE_HELIX_URL, BASE_AUTH_URL, TOKEN_VALIDATION_URL
+from .exceptions import TwitchNotProvidedError
 
 
 class TwitchAPIMixin(object):
@@ -106,3 +107,62 @@ class API(TwitchAPIMixin):
     def get(self):
         response = self._request(path=self._path, method="get", params=self._params)
         return [self._resource.construct(data) for data in response["data"]]
+
+
+class Cursor(TwitchAPIMixin):
+    def __init__(
+        self,
+        client_id=None,
+        client_secret=None,
+        oauth_token=None,
+        path=None,
+        resource=None,
+        cursor=None,
+        params=None,
+    ):
+        super(Cursor, self).__init__()
+        self._path = path
+        self._queue = []
+        self._cursor = cursor
+        self._resource = resource
+        self._client_id = client_id
+        self._client_secret = client_secret
+        self._oauth_token = oauth_token
+        self._params = params
+        self._total = None
+
+        self.next_page()
+
+    def __repr__(self):
+        return repr(self._queue)
+
+    def __len__(self):
+        return len(self._queue)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if not self._queue and not self.next_page():
+            raise StopIteration()
+
+    def next_page(self):
+        if self._cursor:
+            self._params["after"] = self._cursor
+
+        response = self._request(path=self._path, params=self._params, method="get")
+
+        self._queue = [self._resource.construct(data) for data in response["data"]]
+        self._cursor = response["pagination"].get("cursor")
+        self._total = response.get("total")
+        return self._queue
+
+    @property
+    def cursor(self):
+        return self._cursor
+
+    @property
+    def total(self):
+        if not self._total:
+            raise TwitchNotProvidedError()
+        return self._total
