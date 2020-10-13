@@ -4,7 +4,7 @@ from typing import Union
 import datetime
 
 from .utils import get_scope_list_from_string
-from .resources import TwitchObject, User
+from .resources import TwitchObject, User, Cheermote
 from .base import API
 
 
@@ -46,7 +46,7 @@ class Helix(object):
             login (str, list, optional): User login name. Multiple login names can be provided as a list. Limit: 100.
 
         Returns:
-            list: List containing user-information elements.
+            list: List containing User objects.
 
         """
 
@@ -78,5 +78,44 @@ class Helix(object):
             oauth_token=self.oauth_token,
             path="users",
             resource=User,
+            params=params,
+        ).get()
+
+    def get_cheermotes(self, user_id: str = None):
+        """Retrieves the list of available Cheermotes, animated emotes to which viewers can assign Bits, to cheer in chat..
+
+        Note:
+            If authenticating as a user, provide no args to get Cheermotes for authenticated user.
+
+        Args:
+            user_id (str, optional): User ID. Limit: 1.
+
+        Returns:
+            list: List containing Cheermote objects.
+
+        """
+        params = {}
+
+        if user_id is not None:
+            params["broadcaster_id"] = user_id
+
+        if user_id is None and self.oauth_token is not None:
+            validated_tokens = API(
+                client_id=self.client_id,
+                client_secret=self.client_secret,
+                oauth_token=self.oauth_token,
+                resource=User,
+                path=None,
+            )._get_validated_tokens()
+
+            if "login" in validated_tokens:
+                user = self.get_users(login=validated_tokens["login"])[0]
+                self.get_cheermotes(user_id=user.id)
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="bits/cheermotes",
+            resource=Cheermote,
             params=params,
         ).get()

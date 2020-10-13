@@ -67,3 +67,7 @@ class _DateTime(object):
 
 class User(TwitchObject):
     pass
+
+
+class Cheermote(TwitchObject):
+    pass
