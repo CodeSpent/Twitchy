@@ -8,3 +8,11 @@ class TwitchAuthException(TwitchException):
 
 class TwitchNotProvidedError(TwitchException):
     pass
+
+
+class TwitchValueError(ValueError):
+    pass
+
+
+class TwitchAttributeError(AttributeError):
+    pass
