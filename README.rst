@@ -36,14 +36,21 @@ Usage
 
 Contributing
 ===============
-PyTwitch uses Commitizen_ for commit message consistency and pre-commit_ for pre-commit_ Git hooks.
-.. Commitizen_: https://github.com/commitizen-tools/commitizen
-.. pre-commit_: https://pre-commit.com/
+Requirements:
+-------------
+- Commitizen: Commit message consistency.
+- pre-commit: For interfacing with pre-commit git hooks.
+- Black: Code formatting.
+- PyLint: Code linting.
 
-PyTwitch uses Black for code formatting and PyLint for code linting.
+When writing a commit, be sure to use `git commit` without the `-m` to open the commitizen cli.
+
+
+Steps to Contribute:
+------------------
 
 - Fork the repo and create your branch from **main**.
 - If you've added any code that should be tested, add tests.
 - If you've changed APIs or methods that change usage, update documentation.
 - If an issue doesn't exist yet, create an issue.
-- Open a Pull Request referencing the issue.
+- Open a Pull Request referencing the issue # in the message body.
