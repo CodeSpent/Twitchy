@@ -1,19 +1,36 @@
 ============
-pytwitch
+PyTwitch
 ============
 
+PyTwitch is an easy to use Twitch API wrapper with focus on the Helix API, webhooks, and chat.
 
-Add a short description here!
+.. image:: https://user-images.githubusercontent.com/7674344/96326749-5f035e00-1001-11eb-8e55-6ff41e53b074.png
+   :height: 371
+   :width: 507
 
+Requirements
+===============
 
-Description
-===========
+- Python 3.5 or newer
+- A Twitch application
+- Twitch OAuth Token for chat
 
-A longer description of your project goes here...
+Installation
+===============
+pip install <package-not-yet-published>
 
+Usage
+===============
 
-Note
-====
+.. code-block:: python
+from pytwitch import Helix
 
-This project has been set up using PyScaffold 3.2.3. For details and usage
-information on PyScaffold see https://pyscaffold.org/.
+twitch = Helix(client_id="**********", oauth_token="*********")
+
+me = twitch.get_user()
+
+print(me.id)
+print(me.display_name)
+
+Contributing
+===============
