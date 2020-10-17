@@ -77,6 +77,15 @@ class TwitchAPIMixin(object):
         if response.status_code == 429:
             # try the request again after having executed _wait_for_limit_reset
             return self._request(path, params=params, method=method)
+        elif response.status_code == 400:
+            # we can expect a helpful message from twitch and relay that information
+            message = response.json()["message"]
+
+            # error meant to directly mirror structure of raise_for_status() error
+            # for more predictable catching/filtering
+            raise requests.exceptions.HTTPError(
+                f"{response.status_code} Client Error: Bad Request for url: {response.url}: {message}"
+            )
 
         response.raise_for_status()
         return response.json()
@@ -92,6 +101,7 @@ class API(TwitchAPIMixin):
         params={},
         data=None,
         oauth_token=None,
+        page_size=20,
     ):
         super(API, self).__init__()
         self._path = path
@@ -103,9 +113,21 @@ class API(TwitchAPIMixin):
         self._token_expiration = time.time()
         self._params = params
         self._payload = data
+        self._page_size = page_size
+
+        self._params["first"] = self._page_size
 
     def get(self):
         response = self._request(path=self._path, method="get", params=self._params)
+        if "pagination" in response:
+            return Cursor(
+                client_id=self._client_id,
+                client_secret=self._client_secret,
+                oauth_token=self._oauth_token,
+                path=self._path,
+                resource=self._resource,
+                params=self._params,
+            )
         return [self._resource.construct(data) for data in response["data"]]
 
 
@@ -143,18 +165,23 @@ class Cursor(TwitchAPIMixin):
         return self
 
     def __next__(self):
-        if not self._queue and not self.next_page():
+        if not self._queue:
             raise StopIteration()
+
+        return self._queue.pop(0)
 
     def next_page(self):
         if self._cursor:
             self._params["after"] = self._cursor
 
+        return self._make_paginated_request()
+
+    def _make_paginated_request(self):
         response = self._request(path=self._path, params=self._params, method="get")
 
         self._queue = [self._resource.construct(data) for data in response["data"]]
-        self._cursor = response["pagination"].get("cursor")
-        self._total = response.get("total")
+        self._cursor = response["pagination"].get("cursor", None)
+        self._total = response.get("total", None)
         return self._queue
 
     @property

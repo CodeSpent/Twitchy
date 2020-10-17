@@ -71,3 +71,7 @@ class User(TwitchObject):
 
 class Cheermote(TwitchObject):
     pass
+
+
+class Clip(TwitchObject):
+    pass
