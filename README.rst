@@ -22,15 +22,28 @@ pip install <package-not-yet-published>
 Usage
 ===============
 
-.. code-block:: python
-from pytwitch import Helix
+  .. code-block:: python
 
-twitch = Helix(client_id="**********", oauth_token="*********")
+    from pytwitch import Helix
 
-me = twitch.get_user()
+    twitch = Helix(client_id="****", oauth_token="****")
 
-print(me.id)
-print(me.display_name)
+    me = twitch.get_user()
+
+    print(me.id)
+    print(me.display_name)
+
 
 Contributing
 ===============
+PyTwitch uses Commitizen_ for commit message consistency and pre-commit_ for pre-commit_ Git hooks.
+.. Commitizen_: https://github.com/commitizen-tools/commitizen
+.. pre-commit_: https://pre-commit.com/
+
+PyTwitch uses Black for code formatting and PyLint for code linting.
+
+- Fork the repo and create your branch from **main**.
+- If you've added any code that should be tested, add tests.
+- If you've changed APIs or methods that change usage, update documentation.
+- If an issue doesn't exist yet, create an issue.
+- Open a Pull Request referencing the issue.
