@@ -146,12 +146,14 @@ class Helix(object):
         before: str = None,
         after: str = None,
         started_at: str = None,
+        ended_at: str = None,
         page_size: int = 20,
     ) -> list:
         """Retrieves a list of clips for a specified User, Game, or Clip ID.
 
         Note:
             If authenticating as a user, provide no args to get Clips for authenticated user.
+            If 'started_at' or 'ended_at' are specified, both must be provided; otherwise, the ended_at date/time will be 1 week after the started_at value.
 
         Args:
             user_id (str, optional): User ID. Limit: 1.
@@ -159,8 +161,9 @@ class Helix(object):
             clip_id (str, optional): Clip ID. Limit 1.
             before (str, optional): Cursor for backward pagination.
             after (str, optional): Cursor for forward pagination.
+            started_at (str, optional): Starting date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
+            ended_at (str, optional): Ending date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
             page_size (int, optional): Number of items per page. Default: 20. Maximum 100.
-
 
         Returns:
             list: List containing Twitch Clip objects.
@@ -174,11 +177,15 @@ class Helix(object):
             params["game_id"] = game_id
         if clip_id:
             params["id"] = clip_id
+        if started_at:
+            params["started_at"] = started_at
+        if ended_at:
+            params["ended_at"] = ended_at
 
         if not user_id and not game_id and not clip_id and self.oauth_token:
             user = self._get_authenticated_user()
             return self.get_clips(user_id=user.id)
-        else:
+        elif not user_id and not game_id and not clip_id and not self.oauth_token:
             raise TwitchValueError(
                 "Must provide 'user_id', 'game_id', 'clip_id', or authenticate as a user."
             )
