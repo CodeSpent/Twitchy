@@ -4,9 +4,9 @@ from typing import Union
 import datetime
 
 from .utils import get_scope_list_from_string
-from .resources import TwitchObject, User, Cheermote
+from .resources import TwitchObject, User, Cheermote, Clip
 from .exceptions import TwitchValueError, TwitchAttributeError
-from .base import API
+from .base import API, Cursor
 
 
 class Helix(object):
@@ -33,6 +33,18 @@ class Helix(object):
         self.oauth_token: str = oauth_token
         self.refresh_token: str = None
         self.scopes: list = None
+
+    def _get_authenticated_user(self):
+        validated_tokens = API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            resource=User,
+            path=None,
+        )._get_validated_tokens()
+
+        if "login" in validated_tokens:
+            return self.get_user(user_login=validated_tokens["login"])
 
     def get_users(self, user_ids: list = None, user_logins: list = None) -> list:
         """Gets information about one or more specified Twitch users.
@@ -87,19 +99,13 @@ class Helix(object):
             User: A single Twitch User object.
         """
         if user_id is None and user_login is None and self.oauth_token is not None:
-            validated_tokens = API(
-                client_id=self.client_id,
-                client_secret=self.client_secret,
-                oauth_token=self.oauth_token,
-                resource=User,
-                path=None,
-            )._get_validated_tokens()
-
-            if "login" in validated_tokens:
-                self.get_users(user_logins=[validated_tokens["login"]])
-            else:
-                raise TwitchValueError("Must provide a 'user_id' or 'user_login'.")
-        return self.get_users(user_ids=[user_id], user_logins=[user_login])[0]
+            return self._get_authenticated_user()
+        elif user_id is None and user_login is None and self.oauth_token is None:
+            raise TwitchValueError(
+                "Must provide a 'user_id' or 'user_login' or authenticate as a user."
+            )
+        else:
+            return self.get_users(user_ids=[user_id], user_logins=[user_login])[0]
 
     def get_cheermotes(self, user_id: str = None) -> list:
         """Retrieves the list of available Cheermotes, animated emotes to which viewers can assign Bits, to cheer in chat..
@@ -120,17 +126,8 @@ class Helix(object):
             params["broadcaster_id"] = user_id
 
         if user_id is None and self.oauth_token is not None:
-            validated_tokens = API(
-                client_id=self.client_id,
-                client_secret=self.client_secret,
-                oauth_token=self.oauth_token,
-                resource=User,
-                path=None,
-            )._get_validated_tokens()
-
-            if "login" in validated_tokens:
-                user = self.get_users(user_logins=validated_tokens["login"])[0]
-                self.get_cheermotes(user_id=user.id)
+            user = self._get_authenticated_user()
+            self.get_cheermotes(user_id=user.id)
 
         return API(
             client_id=self.client_id,
@@ -139,4 +136,61 @@ class Helix(object):
             path="bits/cheermotes",
             resource=Cheermote,
             params=params,
+        ).get()
+
+    def get_clips(
+        self,
+        user_id: str = None,
+        game_id: str = None,
+        clip_id: str = None,
+        before: str = None,
+        after: str = None,
+        started_at: str = None,
+        page_size: int = 20,
+    ) -> list:
+        """Retrieves a list of clips for a specified User, Game, or Clip ID.
+
+        Note:
+            If authenticating as a user, provide no args to get Clips for authenticated user.
+
+        Args:
+            user_id (str, optional): User ID. Limit: 1.
+            game_id (str, optional): Game ID. Limit 1.
+            clip_id (str, optional): Clip ID. Limit 1.
+            before (str, optional): Cursor for backward pagination.
+            after (str, optional): Cursor for forward pagination.
+            page_size (int, optional): Number of items per page. Default: 20. Maximum 100.
+
+
+        Returns:
+            list: List containing Twitch Clip objects.
+
+        """
+        params = {}
+
+        if user_id:
+            params["broadcaster_id"] = user_id
+        if game_id:
+            params["game_id"] = game_id
+        if clip_id:
+            params["id"] = clip_id
+
+        if page_size and page_size > 100:
+            raise TwitchAttributeError(
+                "Value of 'page_size' must be less than or equal to 100."
+            )
+
+        # the clips endpoint demonstrated an off by one error
+        # relating to the 'first' param. If this is evident on
+        # other endpoints, this should be set in API __init__.
+        page_size = page_size + 1
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="clips",
+            resource=Clip,
+            params=params,
+            page_size=page_size,
         ).get()
