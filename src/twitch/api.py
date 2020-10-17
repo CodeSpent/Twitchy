@@ -175,9 +175,13 @@ class Helix(object):
         if clip_id:
             params["id"] = clip_id
 
-        if not user_id and not game_id and not clip_id:
+        if not user_id and not game_id and not clip_id and self.oauth_token:
             user = self._get_authenticated_user()
             return self.get_clips(user_id=user.id)
+        else:
+            raise TwitchValueError(
+                "Must provide 'user_id', 'game_id', 'clip_id', or authenticate as a user."
+            )
 
         if page_size and page_size > 100:
             raise TwitchAttributeError(
