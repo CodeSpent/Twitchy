@@ -175,6 +175,10 @@ class Helix(object):
         if clip_id:
             params["id"] = clip_id
 
+        if not user_id and not game_id and not clip_id:
+            user = self._get_authenticated_user()
+            return self.get_clips(user_id=user.id)
+
         if page_size and page_size > 100:
             raise TwitchAttributeError(
                 "Value of 'page_size' must be less than or equal to 100."
