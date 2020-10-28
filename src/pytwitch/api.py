@@ -59,6 +59,9 @@ class Helix(object):
         Returns:
             list: List containing Twitch User objects.
 
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#get-users
+
         """
 
         params = {}
@@ -97,6 +100,9 @@ class Helix(object):
 
         Returns:
             User: A single Twitch User object.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#get-users
         """
         if user_id is None and user_login is None and self.oauth_token is not None:
             return self._get_authenticated_user()
@@ -119,6 +125,8 @@ class Helix(object):
         Returns:
             list: List containing Twitch Cheermote objects.
 
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#get-cheermotes
         """
         params = {}
 
@@ -167,6 +175,9 @@ class Helix(object):
 
         Returns:
             list: List containing Twitch Clip objects.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#get-clips
 
         """
         params = {}
