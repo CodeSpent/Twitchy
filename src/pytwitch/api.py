@@ -5,7 +5,7 @@ import datetime
 
 from .utils import get_scope_list_from_string
 from .resources import TwitchObject, User, Cheermote, Clip
-from .exceptions import TwitchValueError, TwitchAttributeError
+from .exceptions import TwitchValueError
 from .base import API, Cursor
 
 
@@ -70,9 +70,9 @@ class Helix(object):
             raise TwitchValueError("Must provide list of 'user_ids' or 'user_logins'.")
 
         if user_ids and len(user_ids) > 100:
-            raise TwitchAttributeError("Maximum of 100 User IDs can be supplied.")
+            raise TwitchValueError("Maximum of 100 User IDs can be supplied.")
         if user_logins and len(user_logins) > 100:
-            raise TwitchAttributeError("Maximum of 100 User Logins can be supplied.")
+            raise TwitchValueError("Maximum of 100 User Logins can be supplied.")
 
         if user_ids:
             params["id"] = user_ids
@@ -202,7 +202,7 @@ class Helix(object):
             )
 
         if page_size and page_size > 100:
-            raise TwitchAttributeError(
+            raise TwitchValueError(
                 "Value of 'page_size' must be less than or equal to 100."
             )
 
@@ -218,5 +218,59 @@ class Helix(object):
             path="clips",
             resource=Clip,
             params=params,
+            page_size=page_size,
+        ).get()
+
+    def get_bits_leaderboard(
+        self,
+        count: int = 10,
+        period: str = "all",
+        started_at: str = None,
+        user_id: str = None,
+        page_size: int = 20,
+    ) -> list:
+        """Retrieves a ranked list of Bits leaderboard information for an authorized broadcaster.
+
+        Note:
+            Requires user authentication and `bits:read` scope.
+
+        Args:
+            count (int, optional): Number of results to be returned. Maximum: 100. Default: 10.
+            period (str, optional): Time period over which data is aggregated (PST time zone). This parameter interacts with `started_at`.
+            started_at (str, optional): Starting date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
+            user_id (str, optional): ID of the user whose results are returned.
+            page_size (int, optional): Default 20.
+
+        Returns:
+            list: List containing Twitch objects.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#get-bits-leaderboard
+
+        """
+        params = {}
+
+        if count > 100:
+            raise TwitchValueError("Value of 'count' must be equal or less than 100.")
+        if period not in ["day", "week", "month", "year", "all"]:
+            raise TwitchValueError(
+                "Value of 'period' must be 'day', 'week', 'month', 'year', or 'all'."
+            )
+
+        params["count"] = count
+        params["period"] = period
+
+        if started_at:
+            params["started_at"] = started_at
+        if user_id:
+            params["user_id"] = user_id
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            path="bits/leaderboard",
+            resource=TwitchObject,
+            params=params,
+            oauth_token=self.oauth_token,
             page_size=page_size,
         ).get()
