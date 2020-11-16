@@ -274,3 +274,38 @@ class Helix(object):
             oauth_token=self.oauth_token,
             page_size=page_size,
         ).get()
+
+    def get_code_status(self, codes: list = None, user_id: str = None):
+        """Retrieves the status of one or more provided bits entitlement codes.
+
+        Note:
+            Requires user authentication.
+
+        Args:
+            codes (list): List of codes to get the status of. Limit: 20.
+            user_id (str): Twitch user id which is going to receive the entitlement associated with the code.
+
+        Returns:
+            list: List containing Twitch objects.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#get-code-status
+
+        """
+        params = {}
+
+        if not codes or len(codes) == 0:
+            raise TwitchValueError("Must provide at least 1 code.")
+        elif codes and len(codes) > 20:
+            raise TwitchValueError("Maximum of 20 codes may be supplied.")
+        elif codes and len(codes) <= 20:
+            params["code"] = codes
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="entitlements/codes",
+            resource=TwitchObject,
+            params=params,
+        ).get()
