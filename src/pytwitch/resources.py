@@ -91,3 +91,7 @@ class BannedUser(TwitchObject):
 
 class BanEvent(TwitchObject):
     pass
+
+
+class ModeratorEvent(TwitchObject):
+    pass
