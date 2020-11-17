@@ -79,3 +79,15 @@ class Clip(TwitchObject):
 
 class Game(TwitchObject):
     pass
+
+
+class HypeTrainEvent(TwitchObject):
+    pass
+
+
+class BannedUser(TwitchObject):
+    pass
+
+
+class BanEvent(TwitchObject):
+    pass

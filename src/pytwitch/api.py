@@ -4,7 +4,16 @@ from typing import Union
 import datetime
 
 from .utils import get_scope_list_from_string
-from .resources import TwitchObject, User, Cheermote, Clip, Game
+from .resources import (
+    TwitchObject,
+    User,
+    Cheermote,
+    Clip,
+    Game,
+    HypeTrainEvent,
+    BannedUser,
+    BanEvent,
+)
 from .exceptions import TwitchValueError
 from .base import API, Cursor
 
@@ -385,4 +394,137 @@ class Helix(object):
             path="games",
             resource=Game,
             params=params,
+        ).get()
+
+    def get_hype_train_events(
+        self,
+        user_id: str = None,
+        event_id: str = None,
+        after: str = None,
+        page_size: int = 20,
+    ):
+        """Gets the information of the most recent Hype Train of the specified Twitch User.
+
+        Note:
+            If authenticating as a user, provide no value for `user_id` to get authenticated user.
+            After 5 days, if no Hype Train has been active, an empty list will be returned.
+
+        Args:
+            user_id (str, optional): User ID of the broadcaster.
+            event_id (str, optional): ID of the event, if known.
+            after (str, optional): Cursor for forward pagination.
+            page_size (int, optional): Number of items per page. Default: 1. Maximum 100.
+
+        Returns:
+            list: List containing Twitch Hype Train Event objects.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#get-hype-train-events
+
+        """
+        params = {}
+
+        if not user_id:
+            # if a user id is not provided
+            # get the authenticated user's id
+            user = self._get_authenticated_user()
+            user_id = user.id
+
+        params["broadcaster_id"] = user_id
+
+        if event_id:
+            params["id"] = event_id
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            path="hypetrain/events",
+            resource=HypeTrainEvent,
+            params=params,
+            oauth_token=self.oauth_token,
+            page_size=page_size,
+        ).get()
+
+    def get_banned_users(
+        self, user_ids: list = None, before: str = None, after: str = None
+    ):
+        """Retrieves all currently banned and timed-out users in authenticated channel.
+
+        Note:
+            Requires user authentication and `moderation:read` scope.
+
+        Args:
+            user_ids (list, optional): List of Twitch User IDs to filter from results.
+            before (str, optional): Cursor for backward pagination.
+            after (str, optional): Cursor for forward pagination.
+
+        Returns:
+            list: List containing Twitch Ban objects.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#get-banned-users
+
+        """
+        params = {}
+
+        # broadcaster_id must always match the oauth token owner
+        # so rather than taking in an obvious argument, get the
+        # currently authenticated user's id instead.
+        user = self._get_authenticated_user()
+        params["broadcaster_id"] = user.id
+
+        if user_ids and len(user_ids) > 100:
+            raise TwitchValueError("Maximum of 100 User IDs may be provided.")
+        elif user_ids and len(user_ids) <= 100:
+            params["user_id"] = user_ids
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            path="moderation/banned",
+            oauth_token=self.oauth_token,
+            params=params,
+            resource=BannedUser,
+        ).get()
+
+    def get_banned_events(
+        self, user_ids: list = None, after: str = None, page_size: int = 20
+    ):
+        """Retrieves all user bans and un-bans in authenticated channel.
+
+        Note:
+            Requires user authentication and `moderation:read` scope.
+
+        Args:
+            user_ids (list, optional): List of Twitch User IDs to filter from results.
+            before (str, optional): Cursor for backward pagination.
+            after (str, optional): Cursor for forward pagination.
+
+        Returns:
+            list: List containing Twitch BanEvent objects.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#get-banned-users
+
+        """
+        params = {}
+
+        # broadcaster_id must always match the oauth token owner
+        # so rather than taking in an obvious argument, get the
+        # currently authenticated user's id instead.
+        user = self._get_authenticated_user()
+        params["broadcaster_id"] = user.id
+
+        if user_ids and len(user_ids) > 100:
+            raise TwitchValueError("Maximum of 100 User IDs may be provided.")
+        elif user_ids and len(user_ids) <= 100:
+            params["user_id"] = user_ids
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="moderation/banned/events",
+            params=params,
+            resource=BanEvent,
         ).get()
