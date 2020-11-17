@@ -323,21 +323,13 @@ class Helix(object):
             params=params,
         ).get()
 
-    def get_top_games(
-        self,
-        after: str = None,
-        before: str = None,
-        first: int = 20,
-        page_size: int = 20,
-    ):
+    def get_top_games(self, first: int = 20, page_size: int = 20):
         """Retrieves the status of one or more provided bits entitlement codes.
 
         Note:
             Requires user authentication.
 
         Args:
-            before (str, optional): Cursor for backward pagination.
-            after (str, optional): Cursor for forward pagination.
             page_size (int, optional): Number of items per page. Default: 20. Maximum 100.
 
         Returns:
@@ -347,7 +339,7 @@ class Helix(object):
             https://dev.twitch.tv/docs/api/reference#get-top-games
 
         """
-        params = {"after": after, "before": before}
+        params = {}
 
         return API(
             client_id=self.client_id,
@@ -449,9 +441,7 @@ class Helix(object):
             page_size=page_size,
         ).get()
 
-    def get_banned_users(
-        self, user_ids: list = None, before: str = None, after: str = None
-    ):
+    def get_banned_users(self, user_ids: list = None):
         """Retrieves all currently banned and timed-out users in authenticated channel.
 
         Note:
@@ -459,8 +449,6 @@ class Helix(object):
 
         Args:
             user_ids (list, optional): List of Twitch User IDs to filter from results.
-            before (str, optional): Cursor for backward pagination.
-            after (str, optional): Cursor for forward pagination.
 
         Returns:
             list: List containing Twitch Ban objects.
@@ -491,9 +479,7 @@ class Helix(object):
             resource=BannedUser,
         ).get()
 
-    def get_banned_events(
-        self, user_ids: list = None, after: str = None, page_size: int = 20
-    ):
+    def get_banned_events(self, user_ids: list = None, page_size: int = 20):
         """Retrieves all user bans and un-bans in authenticated channel.
 
         Note:
@@ -501,8 +487,6 @@ class Helix(object):
 
         Args:
             user_ids (list, optional): List of Twitch User IDs to filter from results.
-            before (str, optional): Cursor for backward pagination.
-            after (str, optional): Cursor for forward pagination.
 
         Returns:
             list: List containing Twitch BanEvent objects.
@@ -640,8 +624,6 @@ class Helix(object):
         user_logins: list = None,
         game_ids: list = None,
         languages: list = None,
-        before: str = None,
-        after: str = None,
         page_size: int = 20,
     ):
         """Retrieves information about active streams sorted by current viewer count in descending order.
@@ -651,8 +633,6 @@ class Helix(object):
             user_logins (list, optional): List of Twitch User Logins. Defaults to None. Limit 100
             game_ids (list, optional): List of Twitch Game IDs. Defaults to None. Limit 100
             languages (list, optional): List of ISO 639-1 language codes. Defaults to None. Limit 100
-            before (str, optional): Cursor for backward pagination. Defaults to None.
-            after (str, optional): Cursor for forward pagination. Defaults to None.
             page_size (int, optional): Number of items per page. Defaults to 20. Maximum 100.
 
         Raises:
