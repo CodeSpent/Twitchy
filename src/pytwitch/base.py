@@ -102,6 +102,8 @@ class API(TwitchAPIMixin):
         data=None,
         oauth_token=None,
         page_size=20,
+        before=None,
+        after=None,
     ):
         super(API, self).__init__()
         self._path = path
@@ -116,6 +118,12 @@ class API(TwitchAPIMixin):
         self._page_size = page_size
 
         self._params["first"] = self._page_size
+
+        if before is not None:
+            self._params["before"] = before
+
+        if after is not None:
+            self._params["after"] = after
 
     def get(self):
         response = self._request(path=self._path, method="get", params=self._params)
@@ -140,6 +148,8 @@ class Cursor(TwitchAPIMixin):
         path=None,
         resource=None,
         cursor=None,
+        after=None,
+        before=None,
         params=None,
     ):
         super(Cursor, self).__init__()
@@ -171,8 +181,18 @@ class Cursor(TwitchAPIMixin):
         return self._queue.pop(0)
 
     def next_page(self):
-        if self._cursor:
-            self._params["after"] = self._cursor
+        self._params["after"] = self._cursor
+
+        if "before" in self._params:
+            self._params.pop("before")
+
+        return self._make_paginated_request()
+
+    def previous_page(self):
+        self._params["before"] = self._cursor
+
+        if "after" in self._params:
+            self._params.pop("after")
 
         return self._make_paginated_request()
 
