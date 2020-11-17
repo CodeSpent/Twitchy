@@ -180,7 +180,8 @@ class Cursor(TwitchAPIMixin):
         response = self._request(path=self._path, params=self._params, method="get")
 
         self._queue = [self._resource.construct(data) for data in response["data"]]
-        self._cursor = response["pagination"].get("cursor", None)
+        if response["pagination"] is not None:
+            self._cursor = response["pagination"].get("cursor", None)
         self._total = response.get("total", None)
         return self._queue
 
