@@ -95,3 +95,7 @@ class BanEvent(TwitchObject):
 
 class ModeratorEvent(TwitchObject):
     pass
+
+
+class StreamKey(TwitchObject):
+    pass

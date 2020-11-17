@@ -14,7 +14,9 @@ from .resources import (
     BannedUser,
     BanEvent,
     ModeratorEvent,
+    StreamKey,
 )
+
 from .exceptions import TwitchValueError
 from .base import API, Cursor
 
@@ -603,4 +605,30 @@ class Helix(object):
             path="moderation/moderators/events",
             params=params,
             resource=ModeratorEvent,
+        ).get()
+
+    def get_stream_key(self):
+        """Retrieves the channel stream key for an authorized user.
+
+        Authorization:
+            Requires user OAuth and `channel:read:stream_key` scope.
+
+        Returns:
+            StreamKey: A Twitch StreamKey object.
+        """
+        params = {}
+
+        # broadcaster_id must always match the oauth token owner
+        # so rather than taking in an obvious argument, get the
+        # currently authenticated user's id instead.
+        user = self._get_authenticated_user()
+        params["broadcaster_id"] = user.id
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="streams/key",
+            params=params,
+            resource=StreamKey,
         ).get()
