@@ -528,3 +528,41 @@ class Helix(object):
             params=params,
             resource=BanEvent,
         ).get()
+
+    def get_moderators(self, user_ids: list = None, after: str = None):
+        """Retrieves all moderators of authenticated user.
+
+        Authorization:
+            Requires user OAuth and `moderation:read` scope.
+
+        Args:
+            user_ids (list, optional): List of Twitch User IDs to filter from results. Defaults to None.
+            after (str, optional): Cursor for forward pagination. Defaults to None.
+
+        Raises:
+            TwitchValueError: If length of user_ids exceeds 100.
+
+        Returns:
+            list: List containing Twitch User objects.
+        """
+        params = {}
+
+        # broadcaster_id must always match the oauth token owner
+        # so rather than taking in an obvious argument, get the
+        # currently authenticated user's id instead.
+        user = self._get_authenticated_user()
+        params["broadcaster_id"] = user.id
+
+        if user_ids and len(user_ids) > 100:
+            raise TwitchValueError("Maximum of 100 User IDs may be provided.")
+        elif user_ids and len(user_ids) <= 100:
+            params["user_id"] = user_ids
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="moderation/moderators",
+            params=params,
+            resource=User,
+        ).get()
