@@ -99,3 +99,7 @@ class ModeratorEvent(TwitchObject):
 
 class StreamKey(TwitchObject):
     pass
+
+
+class Stream(TwitchObject):
+    pass

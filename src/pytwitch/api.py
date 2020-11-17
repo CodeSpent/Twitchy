@@ -15,6 +15,7 @@ from .resources import (
     BanEvent,
     ModeratorEvent,
     StreamKey,
+    Stream,
 )
 
 from .exceptions import TwitchValueError
@@ -631,4 +632,63 @@ class Helix(object):
             path="streams/key",
             params=params,
             resource=StreamKey,
+        ).get()
+
+    def get_streams(
+        self,
+        user_ids: list = None,
+        user_logins: list = None,
+        game_ids: list = None,
+        languages: list = None,
+        before: str = None,
+        after: str = None,
+        page_size: int = 20,
+    ):
+        """Retrieves information about active streams sorted by current viewer count in descending order.
+
+        Args:
+            user_ids (list, optional): List of Twitch User IDs. Defaults to None. Limit 100
+            user_logins (list, optional): List of Twitch User Logins. Defaults to None. Limit 100
+            game_ids (list, optional): List of Twitch Game IDs. Defaults to None. Limit 100
+            languages (list, optional): List of ISO 639-1 language codes. Defaults to None. Limit 100
+            before (str, optional): Cursor for backward pagination. Defaults to None.
+            after (str, optional): Cursor for forward pagination. Defaults to None.
+            page_size (int, optional): Number of items per page. Defaults to 20. Maximum 100.
+
+        Raises:
+            TwitchValueError: If length of user_ids, user_logins, game_ids, or languages exceeds 100.
+
+        Returns:
+            list: List containing Twitch Stream objects.
+        """
+        params = {}
+
+        if user_ids and len(user_ids) > 100:
+            raise TwitchValueError("Maximum of 100 User IDs may be provided.")
+        elif user_ids and len(user_ids) <= 100:
+            params["user_id"] = user_ids
+
+        if user_logins and len(user_logins) > 100:
+            raise TwitchValueError("Maximum of 100 User Logins may be provided.")
+        elif user_logins and len(user_logins) <= 100:
+            params["user_login"] = user_logins
+
+        if game_ids and len(game_ids) > 100:
+            raise TwitchValueError("Maximum of 100 Game IDs may be provided.")
+        elif game_ids and len(game_ids) <= 100:
+            params["game_id"] = game_ids
+
+        if languages and len(languages) > 100:
+            raise TwitchValueError("Maximum of 100 Languages may be provided.")
+        elif languages and len(languages) <= 100:
+            params["language"] = languages
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="streams",
+            params=params,
+            resource=Stream,
+            page_size=page_size,
         ).get()
