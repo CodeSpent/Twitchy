@@ -4,7 +4,7 @@ from typing import Union
 import datetime
 
 from .utils import get_scope_list_from_string
-from .resources import TwitchObject, User, Cheermote, Clip
+from .resources import TwitchObject, User, Cheermote, Clip, Game
 from .exceptions import TwitchValueError
 from .base import API, Cursor
 
@@ -308,4 +308,40 @@ class Helix(object):
             path="entitlements/codes",
             resource=TwitchObject,
             params=params,
+        ).get()
+
+    def get_top_games(
+        self,
+        after: str = None,
+        before: str = None,
+        first: int = 20,
+        page_size: int = 20,
+    ):
+        """Retrieves the status of one or more provided bits entitlement codes.
+
+        Note:
+            Requires user authentication.
+
+        Args:
+            before (str, optional): Cursor for backward pagination.
+            after (str, optional): Cursor for forward pagination.
+            page_size (int, optional): Number of items per page. Default: 20. Maximum 100.
+
+        Returns:
+            list: List containing Twitch Game objects.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#get-top-games
+
+        """
+        params = {"after": after, "before": before}
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="games/top",
+            resource=Game,
+            params=params,
+            page_size=page_size,
         ).get()
