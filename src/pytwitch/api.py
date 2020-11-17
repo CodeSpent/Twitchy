@@ -345,3 +345,44 @@ class Helix(object):
             params=params,
             page_size=page_size,
         ).get()
+
+    def get_games(
+        self, game_ids: list = None, game_names: list = None, box_art_url: str = None
+    ):
+        """Retrieves game information by Game ID, Name, or Box Art URL template.
+
+        Args:
+            game_ids (list, optional): List of Game IDs. Limit: 100
+            game_names (str, optional): List of Game Names. Limit: 100
+            box_art_url (str, optional): Template URL for the game’s box art.
+
+        Returns:
+            list: List containing Twitch Game objects.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#get-games
+
+        """
+        params = {}
+
+        if game_ids and len(game_ids) > 100:
+            raise TwitchValueError("Maximum of 100 Game IDs may be provided.")
+        elif game_ids and len(game_ids) <= 100:
+            params["id"] = game_ids
+
+        if game_names and len(game_names) > 100:
+            raise TwitchValueError("Maximum of 100 Game Names may be provided.")
+        elif game_names and len(game_names) <= 100:
+            params["name"] = game_names
+
+        if box_art_url:
+            params["box_art_url"]
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="games",
+            resource=Game,
+            params=params,
+        ).get()
