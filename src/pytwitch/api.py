@@ -19,6 +19,7 @@ from .resources import (
     StreamMarker,
     Channel,
     Subscription,
+    StreamTag,
 )
 
 from .exceptions import TwitchValueError
@@ -766,4 +767,36 @@ class Helix(object):
             path="subscriptions",
             params=params,
             resource=Subscription,
+        ).get()
+
+    def get_all_stream_tags(self, tag_ids: list = None, page_size: int = 20):
+        """Retrieves a list of all stream tags defined by Twitch.
+
+        Args:
+            tag_ids (list, optional): List of Twitch Tag IDs to filter from results. Defaults to None Maximum 100.
+            page_size (int, optional): Number of items per page. Defaults to 20. Maximum 100.
+
+        Raises:
+            TwitchValueError: If length of user_ids exceeds 100.
+
+        Returns:
+            Cursor: Iterable cursor containing StreamTag objects and pagination details.
+        """
+        params = {}
+
+        if tag_ids and len(tag_ids) > 100:
+            raise TwitchValueError("Maximum of 100 tag_ids may be provided.")
+        elif tag_ids and len(tag_ids) <= 100:
+            # twitch accepts tag ids provided in a string
+            # with tag ids separated by ampersands.
+            params["tag_id"] = "&".join(tag_ids)
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="tags/streams",
+            params=params,
+            resource=StreamTag,
+            page_size=page_size,
         ).get()

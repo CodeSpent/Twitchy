@@ -115,3 +115,7 @@ class Channel(TwitchObject):
 
 class Subscription(TwitchObject):
     pass
+
+
+class StreamTag(TwitchObject):
+    pass
