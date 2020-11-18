@@ -800,3 +800,31 @@ class Helix(object):
             resource=StreamTag,
             page_size=page_size,
         ).get()
+
+    def get_stream_tags(self, user_id: str = None):
+        """Retrieves a list of stream tags for a specified channel.
+
+        Args:
+            user_id (str, optional): Twitch User ID. Defaults to None.
+
+        Raises:
+            TwitchValueError: If no user_id is provided.
+
+        Returns:
+            List: List containing StreamTag objects.
+        """
+        params = {}
+
+        if user_id:
+            params["broadcaster_id"] = user_id
+        else:
+            raise TwitchValueError("Must provide a `user_id`.")
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="streams/tags",
+            params=params,
+            resource=StreamTag,
+        ).get()
