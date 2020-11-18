@@ -18,6 +18,7 @@ from .resources import (
     Stream,
     StreamMarker,
     Channel,
+    Subscription,
 )
 
 from .exceptions import TwitchValueError
@@ -734,3 +735,35 @@ class Helix(object):
             params=params,
             resource=Channel,
         ).get()[0]
+
+    def get_broadcaster_subscriptions(self, user_ids: list = None):
+        """Retrieves a list of users subscribed to authenticated user's channel.
+
+        Authorization:
+            Requires user OAuth token and `channel:read:subscriptions` scope.
+
+        Args:
+            user_ids (list, optional): List of Twitch User IDs to filter from results. Defaults to None.
+
+        Raises:
+            TwitchValueError: If length of user_ids exceeds 100.
+
+        Returns:
+            Cursor: Iterable cursor containing Subscription objects and pagination details.
+        """
+
+        params = {}
+
+        if user_ids and len(user_ids) > 100:
+            raise TwitchValueError("Maximum of 100 User IDs may be provided.")
+        elif user_ids and len(user_ids) <= 100:
+            params["user_id"] = user_ids
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="subscriptions",
+            params=params,
+            resource=Subscription,
+        ).get()
