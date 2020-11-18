@@ -17,6 +17,7 @@ from .resources import (
     StreamKey,
     Stream,
     StreamMarker,
+    Channel,
 )
 
 from .exceptions import TwitchValueError
@@ -707,3 +708,29 @@ class Helix(object):
             resource=StreamMarker,
             page_size=page_size,
         ).get()
+
+    def get_channel_information(self, user_id: str = None):
+        """Retrieves Channel information for a specified user.
+
+        Args:
+            user_id (str, optional): Twitch User ID. Defaults to None.
+
+        Raises:
+            TwitchValueError: If no user_id is provided.
+
+        Returns:
+            Channel: A single Twitch Channel object.
+        """
+        if user_id:
+            params = {"broadcaster_id": user_id}
+        else:
+            raise TwitchValueError("Must provide a `user_id`.")
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="channels",
+            params=params,
+            resource=Channel,
+        ).get()[0]

@@ -107,3 +107,7 @@ class Stream(TwitchObject):
 
 class StreamMarker(TwitchObject):
     pass
+
+
+class Channel(TwitchObject):
+    pass
