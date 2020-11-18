@@ -203,7 +203,7 @@ class Cursor(TwitchAPIMixin):
         if response["pagination"] is not None:
             self._cursor = response["pagination"].get("cursor", None)
         self._total = response.get("total", None)
-        return self._queue
+        return self
 
     @property
     def cursor(self):
