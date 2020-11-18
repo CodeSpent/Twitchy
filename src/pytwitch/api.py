@@ -639,7 +639,7 @@ class Helix(object):
             TwitchValueError: If length of user_ids, user_logins, game_ids, or languages exceeds 100.
 
         Returns:
-            list: List containing Twitch Stream objects.
+            Cursor: Iterable cursor containing Stream objects and pagination details.
         """
         params = {}
 
