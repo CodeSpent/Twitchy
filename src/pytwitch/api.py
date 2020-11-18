@@ -689,7 +689,7 @@ class Helix(object):
             page_size (int, optional): Number of items per page. Defaults to 20. Maximum 100.
 
         Returns:
-            list: List containing Twitch StreamMarker objects.
+            Cursor: Iterable cursor containing Stream objects and pagination details.
         """
         params = {}
 
