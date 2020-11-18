@@ -103,3 +103,7 @@ class StreamKey(TwitchObject):
 
 class Stream(TwitchObject):
     pass
+
+
+class StreamMarker(TwitchObject):
+    pass

@@ -16,6 +16,7 @@ from .resources import (
     ModeratorEvent,
     StreamKey,
     Stream,
+    StreamMarker,
 )
 
 from .exceptions import TwitchValueError
@@ -670,5 +671,39 @@ class Helix(object):
             path="streams",
             params=params,
             resource=Stream,
+            page_size=page_size,
+        ).get()
+
+    def get_stream_markers(
+        self, user_id: str = None, video_id: str = None, page_size: int = 20
+    ):
+        """Retrieves a list of StreamMarker objects for specified user or video.
+
+        Authorization:
+            Requires user OAuth and `user:read:broadcast`
+
+        Args:
+            user_id (str, optional): Twitch User ID. Defaults to None.
+            video_id (str, optional): Twitch Video ID. Defaults to None.
+            page_size (int, optional): Number of items per page. Defaults to 20. Maximum 100.
+
+        Returns:
+            list: List containing Twitch StreamMarker objects.
+        """
+        params = {}
+
+        if user_id:
+            params["user_id"] = user_id
+
+        if video_id:
+            params["video_id"] = video_id
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="streams/markers",
+            params=params,
+            resource=StreamMarker,
             page_size=page_size,
         ).get()
