@@ -20,6 +20,7 @@ from .resources import (
     Channel,
     Subscription,
     StreamTag,
+    Follow,
 )
 
 from .exceptions import TwitchValueError
@@ -827,4 +828,44 @@ class Helix(object):
             path="streams/tags",
             params=params,
             resource=StreamTag,
+        ).get()
+
+    def get_users_follows(
+        self, from_id: str = None, to_id: str = None, page_size: int = 20
+    ):
+        """Retrieves list of follow relationships between two users.
+
+        Args:
+            from_id (str, optional): Twitch User ID of user following. Defaults to None.
+            to_id (str, optional): Twitch User ID of user being followed. Defaults to None.
+            page_size (int, optional): Number of items per page. Defaults to 20. Maximum 100.
+
+        Raises:
+            TwitchValueError: If values of to_id and from_id match or neither are provided.
+
+        Returns:
+            Cursor: Iterable cursor containing Follow objects and pagination details.
+        """
+        params = {}
+
+        if from_id and to_id and to_id == from_id:
+            raise TwitchValueError("Value of 'to_id' cannot match 'from_id'.")
+
+        if not from_id and not to_id:
+            raise TwitchValueError("Must provide either a 'to_id', 'from_id', or both.")
+
+        if from_id:
+            params["from_id"] = from_id
+
+        if to_id:
+            params["to_id"] = to_id
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="follows",
+            params=params,
+            resource=Follow,
+            page_size=page_size,
         ).get()

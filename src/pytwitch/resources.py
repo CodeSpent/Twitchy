@@ -119,3 +119,7 @@ class Subscription(TwitchObject):
 
 class StreamTag(TwitchObject):
     pass
+
+
+class Follow(TwitchObject):
+    pass
