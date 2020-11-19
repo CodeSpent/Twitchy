@@ -22,6 +22,7 @@ from .resources import (
     StreamTag,
     Follow,
     Extension,
+    Video,
 )
 
 from .exceptions import TwitchValueError
@@ -255,7 +256,7 @@ class Helix(object):
 
         Args:
             count (int, optional): Number of results to be returned. Maximum: 100. Default: 10.
-            period (str, optional): Time period over which data is aggregated (PST time zone). This parameter interacts with `started_at`.
+            period (str, optional): Time period over which data is aggregated  (all, day, week, or month). Defaults to "all".
             started_at (str, optional): Starting date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
             user_id (str, optional): ID of the user whose results are returned.
             page_size (int, optional): Default 20.
@@ -921,4 +922,68 @@ class Helix(object):
             path="users/extensions",
             resource=Extension,
             params=params,
+        ).get()
+
+    def get_videos(
+        self,
+        video_ids: list = None,
+        user_id: str = None,
+        game_id: str = None,
+        language: str = None,
+        period: str = "all",
+        sort_by: str = "time",
+        type: str = "all",
+        page_size: int = 20,
+    ):
+        """Retrieves a list of videos by video ids, or for specified user or game.
+
+        Args:
+            video_ids (list, optional): List of Twitch Video IDs. Defaults to None.
+            user_id (str, optional): Twitch User ID. Defaults to None.
+            game_id (str, optional): Twitch Game ID. Defaults to None.
+            language (str, optional): ISO 639-1 language code. Defaults to None.
+            period (str, optional): Period during which video was created (all, day, week, or month). Defaults to "all".
+            sort_by (str, optional): Sort order of videos (time, trending, or views). Defaults to "time".
+            type (str, optional): Type of videos to return (all, upload, archive, or highlight). Defaults to "all".
+            page_size (int, optional): Number of items per page. Defaults to 20. Maximum 100.
+
+        Raises:
+            TwitchValueError: If no 'user_id', 'video_ids', or 'game_id' is provided.
+
+        Returns:
+            Cursor: Iterable cursor containing Follow objects and pagination details.
+        """
+        params = {}
+
+        if not video_ids and not user_id and not game_id:
+            raise TwitchValueError(
+                "Must provide any combination of 'video_id', 'user_id', and/or 'game_id'."
+            )
+
+        if video_ids and len(video_ids) > 100:
+            raise TwitchValueError("Maximum of 100 video user_ids can be provided.")
+        elif video_ids and len(video_ids) <= 100:
+            params["video_id"] = video_ids
+
+        if user_id:
+            params["user_id"] = user_id
+
+        if game_id:
+            params["game_id"] = user_id
+
+        if language:
+            params["language"] = language
+
+        params["period"] = period
+        params["sort"] = sort_by
+        params["type"] = type
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="videos",
+            resource=Video,
+            params=params,
+            page_size=page_size,
         ).get()

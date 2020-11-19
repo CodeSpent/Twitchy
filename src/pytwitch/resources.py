@@ -127,3 +127,7 @@ class Follow(TwitchObject):
 
 class Extension(TwitchObject):
     pass
+
+
+class Video(TwitchObject):
+    pass
