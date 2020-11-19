@@ -123,3 +123,7 @@ class StreamTag(TwitchObject):
 
 class Follow(TwitchObject):
     pass
+
+
+class Extension(TwitchObject):
+    pass

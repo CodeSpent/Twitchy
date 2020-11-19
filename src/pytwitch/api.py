@@ -21,6 +21,7 @@ from .resources import (
     Subscription,
     StreamTag,
     Follow,
+    Extension,
 )
 
 from .exceptions import TwitchValueError
@@ -868,4 +869,21 @@ class Helix(object):
             params=params,
             resource=Follow,
             page_size=page_size,
+        ).get()
+
+    def get_user_extensions(self):
+        """Retrieves a list of all extensions (both active and inactive) for authenticated user.
+
+        Authorization:
+            Requires user OAuth and `user:read:broadcast` scope.
+
+        Returns:
+            Cursor: Iterable cursor containing Follow objects and pagination details.
+        """
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="users/extensions/list",
+            resource=Extension,
         ).get()
