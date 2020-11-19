@@ -887,3 +887,38 @@ class Helix(object):
             path="users/extensions/list",
             resource=Extension,
         ).get()
+
+    def get_user_active_extensions(self, user_id: str = None):
+        """Retrieves a list of active extensions for a specified user.
+
+        Args:
+            user_id (str, optional): Twitch User ID. Defaults to None.
+
+        Raises:
+            TwitchValueError: If no user_id is provided and oauth token does not belong to a valid user.
+
+        Returns:
+            List: List containing Extension objects.
+        """
+        params = {}
+
+        if not user_id:
+            # if no user_id is provided, verify the oauth token is
+            # for a user before proceeding
+            user = self._get_authenticated_user()
+            if user.id:
+                user_id = user.id
+            else:
+                raise TwitchValueError(
+                    "Must provide a 'user_id' or authenticate as a user."
+                )
+
+        params["user_id"] = user_id
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="users/extensions",
+            resource=Extension,
+            params=params,
+        ).get()
