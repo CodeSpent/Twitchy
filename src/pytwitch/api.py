@@ -23,6 +23,7 @@ from .resources import (
     Follow,
     Extension,
     Video,
+    WebhookSubscription,
 )
 
 from .exceptions import TwitchValueError
@@ -985,5 +986,23 @@ class Helix(object):
             path="videos",
             resource=Video,
             params=params,
+            page_size=page_size,
+        ).get()
+
+    def get_webhook_subscriptions(self, page_size: int = 20):
+        """Retrieves list of webhook subscriptions of an authenticated app/user.
+
+        Args:
+            page_size (int, optional): Number of items per page. Defaults to 20. Maximum 100.
+
+        Returns:
+            Cursor: Iterable cursor containing Follow objects and pagination details.
+        """
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            path="webhooks/subscriptions",
+            resource=WebhookSubscription,
             page_size=page_size,
         ).get()

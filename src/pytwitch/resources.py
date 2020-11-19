@@ -131,3 +131,7 @@ class Extension(TwitchObject):
 
 class Video(TwitchObject):
     pass
+
+
+class WebhookSubscription(TwitchObject):
+    pass
