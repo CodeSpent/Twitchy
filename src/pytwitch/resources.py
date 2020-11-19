@@ -79,3 +79,59 @@ class Clip(TwitchObject):
 
 class Game(TwitchObject):
     pass
+
+
+class HypeTrainEvent(TwitchObject):
+    pass
+
+
+class BannedUser(TwitchObject):
+    pass
+
+
+class BanEvent(TwitchObject):
+    pass
+
+
+class ModeratorEvent(TwitchObject):
+    pass
+
+
+class StreamKey(TwitchObject):
+    pass
+
+
+class Stream(TwitchObject):
+    pass
+
+
+class StreamMarker(TwitchObject):
+    pass
+
+
+class Channel(TwitchObject):
+    pass
+
+
+class Subscription(TwitchObject):
+    pass
+
+
+class StreamTag(TwitchObject):
+    pass
+
+
+class Follow(TwitchObject):
+    pass
+
+
+class Extension(TwitchObject):
+    pass
+
+
+class Video(TwitchObject):
+    pass
+
+
+class WebhookSubscription(TwitchObject):
+    pass
