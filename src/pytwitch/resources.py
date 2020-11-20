@@ -135,3 +135,7 @@ class Video(TwitchObject):
 
 class WebhookSubscription(TwitchObject):
     pass
+
+
+class Commercial(TwitchObject):
+    pass

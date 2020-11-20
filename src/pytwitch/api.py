@@ -24,6 +24,7 @@ from .resources import (
     Extension,
     Video,
     WebhookSubscription,
+    Commercial,
 )
 
 from .exceptions import TwitchValueError
@@ -1006,3 +1007,39 @@ class Helix(object):
             resource=WebhookSubscription,
             page_size=page_size,
         ).get()
+
+    def start_commercial(self, length: int = 30):
+        """Starts a commercial on the authenticated channel.
+
+        Args:
+            length (int, optional): Desired length of the commercial in seconds (30, 60, 90, 120, 150, or 180). Defaults to 30.
+
+        Raises:
+            TwitchValueError: If value of length is not a valid option.
+
+        Returns:
+            Commercial: A single Commercial object.
+        """
+        payload = {}
+
+        # broadcaster_id must always match the oauth token owner
+        # so rather than taking in an obvious argument, get the
+        # currently authenticated user's id instead.
+        user = self._get_authenticated_user()
+        payload["broadcaster_id"] = user.id
+
+        if length not in [30, 60, 90, 120, 150, 180]:
+            raise TwitchValueError(
+                "Value of 'length' must be '30', '60', '90', '120', '150', or '180'."
+            )
+
+        payload["length"] = length
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            data=payload,
+            path="channels/commercial",
+            resource=Commercial,
+        ).post()
