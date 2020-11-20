@@ -894,6 +894,9 @@ class Helix(object):
     def get_user_active_extensions(self, user_id: str = None):
         """Retrieves a list of active extensions for a specified user.
 
+        Authorization:
+            Requires user OAuth and optionally `user:read:broadcast` or `user:edit:broadcast` scope.
+
         Args:
             user_id (str, optional): Twitch User ID. Defaults to None.
 
