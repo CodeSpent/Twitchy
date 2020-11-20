@@ -996,6 +996,9 @@ class Helix(object):
     def get_webhook_subscriptions(self, page_size: int = 20):
         """Retrieves list of webhook subscriptions of an authenticated app/user.
 
+        Authorization:
+            Requires User OAuth or App Access Token.
+
         Args:
             page_size (int, optional): Number of items per page. Defaults to 20. Maximum 100.
 
