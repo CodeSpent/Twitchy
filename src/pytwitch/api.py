@@ -1052,3 +1052,38 @@ class Helix(object):
             path="channels/commercial",
             resource=Commercial,
         ).post()
+
+    def create_stream_marker(self, user_id: str = None, description: str = None):
+        """Creates a StreamMarker for a specified user.
+
+        Authorization:
+            Requires User OAuth and `user:edit:broadcast` scope.
+
+        Args:
+            user_id (str, optional): Twitch User ID. Defaults to None.
+            description (str, optional): Description of or comments on the marker. Max length is 140 characters. Defaults to None.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#create-stream-marker
+
+        Returns:
+            StreamMarker: A single StreamMarker object.
+
+        """
+        payload = {}
+
+        if user_id is None:
+            user = self._get_authenticated_user()
+            user_id = user.id
+
+        payload["user_id"] = user_id
+        payload["description"] = description
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            data=payload,
+            path="streams/markers",
+            resource=StreamMarker,
+        ).post()[0]
