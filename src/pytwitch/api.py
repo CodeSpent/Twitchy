@@ -1017,6 +1017,9 @@ class Helix(object):
     def start_commercial(self, length: int = 30):
         """Starts a commercial on the authenticated channel.
 
+        Authorization:
+            Requires user OAuth and `channel:edit:commercial` scope.
+
         Args:
             length (int, optional): Desired length of the commercial in seconds (30, 60, 90, 120, 150, or 180). Defaults to 30.
 
