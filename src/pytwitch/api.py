@@ -25,6 +25,7 @@ from .resources import (
     Video,
     WebhookSubscription,
     Commercial,
+    AutomodStatus,
 )
 
 from .exceptions import TwitchValueError
@@ -1087,3 +1088,44 @@ class Helix(object):
             path="streams/markers",
             resource=StreamMarker,
         ).post()[0]
+
+    def create_user_follows(
+        self, from_id: str = None, to_id: str = None, allow_notifications: bool = False
+    ):
+        """Adds a specified user to the followers of a specific channel.
+
+        Authorization:
+            User OAuth (required)
+            Scope required: user:edit:follows
+
+        Args:
+            from_id (str, optional): User ID of the follower. Defaults to None.
+            to_id (str, optional): User ID of the channel to be followed. Defaults to None.
+            allow_notifications (bool, optional): Whether or not to enable notifications for the user. Defaults to False.
+
+        Raises:
+            TwitchValueError: If from_id or to_id are not provided.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#create-user-follows
+
+        Returns:
+            bool: True if created, False if failed.
+        """
+        params = {}
+
+        if not from_id or not to_id:
+            raise TwitchValueError("Must include both 'from_id' and 'to_id'.")
+
+        params["from_id"] = from_id
+        params["to_id"] = to_id
+        params["allow_notifications"] = allow_notifications
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            params=params,
+            path="users/follows",
+            resource=Follow,
+        ).post()
