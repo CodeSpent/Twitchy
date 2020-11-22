@@ -138,6 +138,12 @@ class API(TwitchAPIMixin):
             )
         return [self._resource.construct(data) for data in response["data"]]
 
+    def post(self):
+        response = self._request(
+            path=self._path, method="post", params=self._params, data=self._payload
+        )
+        return [self._resource.construct(data) for data in response["data"]]
+
 
 class Cursor(TwitchAPIMixin):
     def __init__(

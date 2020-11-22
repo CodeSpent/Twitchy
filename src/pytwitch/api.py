@@ -24,6 +24,8 @@ from .resources import (
     Extension,
     Video,
     WebhookSubscription,
+    Commercial,
+    AutomodStatus,
 )
 
 from .exceptions import TwitchValueError
@@ -893,6 +895,9 @@ class Helix(object):
     def get_user_active_extensions(self, user_id: str = None):
         """Retrieves a list of active extensions for a specified user.
 
+        Authorization:
+            Requires user OAuth and optionally `user:read:broadcast` or `user:edit:broadcast` scope.
+
         Args:
             user_id (str, optional): Twitch User ID. Defaults to None.
 
@@ -992,6 +997,9 @@ class Helix(object):
     def get_webhook_subscriptions(self, page_size: int = 20):
         """Retrieves list of webhook subscriptions of an authenticated app/user.
 
+        Authorization:
+            Requires User OAuth or App Access Token.
+
         Args:
             page_size (int, optional): Number of items per page. Defaults to 20. Maximum 100.
 
@@ -1006,3 +1014,118 @@ class Helix(object):
             resource=WebhookSubscription,
             page_size=page_size,
         ).get()
+
+    def start_commercial(self, length: int = 30):
+        """Starts a commercial on the authenticated channel.
+
+        Authorization:
+            Requires user OAuth and `channel:edit:commercial` scope.
+
+        Args:
+            length (int, optional): Desired length of the commercial in seconds (30, 60, 90, 120, 150, or 180). Defaults to 30.
+
+        Raises:
+            TwitchValueError: If value of length is not a valid option.
+
+        Returns:
+            Commercial: A single Commercial object.
+        """
+        payload = {}
+
+        # broadcaster_id must always match the oauth token owner
+        # so rather than taking in an obvious argument, get the
+        # currently authenticated user's id instead.
+        user = self._get_authenticated_user()
+        payload["broadcaster_id"] = user.id
+
+        if length not in [30, 60, 90, 120, 150, 180]:
+            raise TwitchValueError(
+                "Value of 'length' must be '30', '60', '90', '120', '150', or '180'."
+            )
+
+        payload["length"] = length
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            data=payload,
+            path="channels/commercial",
+            resource=Commercial,
+        ).post()
+
+    def create_stream_marker(self, user_id: str = None, description: str = None):
+        """Creates a StreamMarker for a specified user.
+
+        Authorization:
+            Requires User OAuth and `user:edit:broadcast` scope.
+
+        Args:
+            user_id (str, optional): Twitch User ID. Defaults to None.
+            description (str, optional): Description of or comments on the marker. Max length is 140 characters. Defaults to None.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#create-stream-marker
+
+        Returns:
+            StreamMarker: A single StreamMarker object.
+
+        """
+        payload = {}
+
+        if user_id is None:
+            user = self._get_authenticated_user()
+            user_id = user.id
+
+        payload["user_id"] = user_id
+        payload["description"] = description
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            data=payload,
+            path="streams/markers",
+            resource=StreamMarker,
+        ).post()[0]
+
+    def create_user_follows(
+        self, from_id: str = None, to_id: str = None, allow_notifications: bool = False
+    ):
+        """Adds a specified user to the followers of a specific channel.
+
+        Authorization:
+            User OAuth (required)
+            Scope required: user:edit:follows
+
+        Args:
+            from_id (str, optional): User ID of the follower. Defaults to None.
+            to_id (str, optional): User ID of the channel to be followed. Defaults to None.
+            allow_notifications (bool, optional): Whether or not to enable notifications for the user. Defaults to False.
+
+        Raises:
+            TwitchValueError: If from_id or to_id are not provided.
+
+        Reference:
+            https://dev.twitch.tv/docs/api/reference#create-user-follows
+
+        Returns:
+            bool: True if created, False if failed.
+        """
+        params = {}
+
+        if not from_id or not to_id:
+            raise TwitchValueError("Must include both 'from_id' and 'to_id'.")
+
+        params["from_id"] = from_id
+        params["to_id"] = to_id
+        params["allow_notifications"] = allow_notifications
+
+        return API(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            oauth_token=self.oauth_token,
+            params=params,
+            path="users/follows",
+            resource=Follow,
+        ).post()
