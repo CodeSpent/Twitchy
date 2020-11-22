@@ -1110,7 +1110,7 @@ class Helix(object):
             https://dev.twitch.tv/docs/api/reference#create-user-follows
 
         Returns:
-            bool: True if created, False if failed.
+            None
         """
         params = {}
 
