@@ -1,8 +1,8 @@
 ============
-pytwitch
+twitchy
 ============
 
-This is the documentation of **pytwitch**.
+This is the documentation of **twitchy**.
 
 .. note::
 
