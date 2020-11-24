@@ -25,7 +25,6 @@ from .resources import (
     Video,
     WebhookSubscription,
     Commercial,
-    AutomodStatus,
 )
 
 from .exceptions import TwitchValueError
