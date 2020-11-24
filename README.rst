@@ -59,7 +59,8 @@ and PyTwitch will handle authorization for you when necessary.
 
     twitch = Helix(client_id="****", client_secret="****")
 
-To get a Client ID and Client Secret, register an app on the _Twitch Dev Console: https://dev.twitch.tv/.
+To get a Client ID and Client Secret, register an app on the `Twitch Dev Console`_.
+
 
 **Making Requests**
 -------------------
@@ -68,7 +69,7 @@ Methods on the `Helix` class will all be named as obviously as possible by namin
 after the Twitch Helix endpoint they're interfacing with. You can find examples in our examples
 folder.
 
-Reference for Twitch Helix endpoints can be found in the _Twitch Helix API documentation: https://dev.twitch.tv/docs/api/reference.
+Reference for Twitch Helix endpoints can be found in the `Twitch Helix API documentation`_.
 
 
 Contributing
@@ -94,3 +95,12 @@ Steps to Contribute:
 
 If contributing user-facing methods, be sure to use the included `docstringsTemplate` mustache config for docstrings either via
 editor extension, or manual process.
+
+
+Reference Links
+--------------
+- Twitch Dev Console: https://dev.twitch.tv/
+- Twitch Helix API Documentation: https://dev.twitch.tv/docs/api/reference
+
+.. _Twitch Dev Console: https://dev.twitch.tv/
+.. _Twitch Helix API Documentation: https://dev.twitch.tv/docs/api/reference
