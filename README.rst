@@ -43,7 +43,8 @@ by a User Access Token or an App Access Token.
 
 To authenticate as a user, provide the OAuth token when instantiating `Helix`.
 
-  .. code-block::python
+  .. code-block:: python
+
     from pytwitch import Helix
 
     twitch = Helix(client_id="****", oauth_token="****")
@@ -51,7 +52,9 @@ To authenticate as a user, provide the OAuth token when instantiating `Helix`.
 To authenticate using an `App Access Token`, just provide the Client ID and Client Secret,
 and PyTwitch will handle authorization for you when necessary.
 
-  .. code-block::python
+
+  .. code-block:: python
+
     from pytwitch import Helix
 
     twitch = Helix(client_id="****", client_secret="****")
