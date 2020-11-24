@@ -5,7 +5,7 @@ from .api import Helix
 
 try:
     # Change here if project is renamed and does not equal the package name
-    dist_name = "pytwitch"
+    dist_name = "twitchy"
     __version__ = get_distribution(dist_name).version
 except DistributionNotFound:
     __version__ = "unknown"

@@ -1,8 +1,8 @@
 ============
-PyTwitch
+twitchy
 ============
 
-PyTwitch is an easy to use Twitch API wrapper with focus on the Helix API, webhooks, and chat.
+twitchy is an easy to use Twitch API wrapper with focus on the Helix API, webhooks, and chat.
 
 .. image:: https://user-images.githubusercontent.com/7674344/96326749-5f035e00-1001-11eb-8e55-6ff41e53b074.png
    :height: 371
@@ -24,7 +24,7 @@ Usage
 
   .. code-block:: python
 
-    from pytwitch import Helix
+    from twitchy import Helix
 
     twitch = Helix(client_id="****", oauth_token="****")
 
@@ -45,17 +45,17 @@ To authenticate as a user, provide the OAuth token when instantiating `Helix`.
 
   .. code-block:: python
 
-    from pytwitch import Helix
+    from twitchy import Helix
 
     twitch = Helix(client_id="****", oauth_token="****")
 
 To authenticate using an `App Access Token`, just provide the Client ID and Client Secret,
-and PyTwitch will handle authorization for you when necessary.
+and twitchy will handle authorization for you when necessary.
 
 
   .. code-block:: python
 
-    from pytwitch import Helix
+    from twitchy import Helix
 
     twitch = Helix(client_id="****", client_secret="****")
 
