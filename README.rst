@@ -1,8 +1,8 @@
 ============
-twitchy
+Twitchy
 ============
 
-twitchy is an easy to use Twitch API wrapper with focus on the Helix API, webhooks, and chat.
+Twitchy is an easy to use Twitch API wrapper with focus on the Helix API, webhooks, and chat.
 
 .. image:: https://user-images.githubusercontent.com/7674344/100273792-5ae52d00-2f2b-11eb-9710-588aeec63a50.png
    :height: 371
@@ -17,7 +17,7 @@ Requirements
 
 Installation
 ===============
-pip install <package-not-yet-published>
+pip install twitchy
 
 Usage
 ===============
@@ -50,7 +50,7 @@ To authenticate as a user, provide the OAuth token when instantiating `Helix`.
     twitch = Helix(client_id="****", oauth_token="****")
 
 To authenticate using an `App Access Token`, just provide the Client ID and Client Secret,
-and twitchy will handle authorization for you when necessary.
+and Twitchy will handle authorization for you when necessary.
 
 
   .. code-block:: python
