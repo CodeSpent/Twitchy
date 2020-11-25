@@ -17,7 +17,10 @@ Requirements
 
 Installation
 ===============
-pip install twitchy
+
+  .. code-block:: bash
+
+    pip install twitchy
 
 Usage
 ===============
