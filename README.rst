@@ -98,7 +98,7 @@ editor extension, or manual process.
 
 
 Reference Links
---------------
+---------------
 - Twitch Dev Console: https://dev.twitch.tv/
 - Twitch Helix API Documentation: https://dev.twitch.tv/docs/api/reference
 
