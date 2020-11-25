@@ -4,7 +4,7 @@ twitchy
 
 twitchy is an easy to use Twitch API wrapper with focus on the Helix API, webhooks, and chat.
 
-.. image:: https://user-images.githubusercontent.com/7674344/96326749-5f035e00-1001-11eb-8e55-6ff41e53b074.png
+.. image:: https://user-images.githubusercontent.com/7674344/100273792-5ae52d00-2f2b-11eb-9710-588aeec63a50.png
    :height: 371
    :width: 507
 
