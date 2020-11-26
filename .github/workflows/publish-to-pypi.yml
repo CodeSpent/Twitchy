@@ -31,13 +31,15 @@ jobs:
         .
 
     - name: Publish package to Test PyPi
-      uses: pypa/gh-action-pypi-publish@main
+      uses: pypa/gh-action-pypi-publish@master
       with:
+        user: __token__
         password: ${{ secrets.test_pypi_api_key }}
         repository_url: https://test.pypi.org/legacy/
 
     - name: Publish package to PyPi if properly tagged
       if: startsWith(github.ref, 'refs/tags')
-      uses: pypa/gh-action-pypi-publish@main
+      uses: pypa/gh-action-pypi-publish@master
       with:
+        user: __token__
         password: ${{ secrets.pypi_api_key }}
