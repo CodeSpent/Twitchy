@@ -46,6 +46,17 @@ class TwitchAPIMixin(object):
         response["expires_in"] = int(time.time()) + response["expires_in"]
         return response
 
+    def _refresh_oauth_token(self):
+        params = {
+            "client_id": self._client_id,
+            "client_secret": self._client_secret,
+            "grant_type": "refresh_token",
+            "refresh_token": self._refresh_token
+        }
+        response = self._request(base_url=BASE_AUTH_URL, method="post", params=params)
+        self._refresh_token = response["refresh_token"]
+        self._oauth_token = response["access_token"]
+
     def _get_validated_tokens(self):
         return self._request(base_url=TOKEN_VALIDATION_URL)
 
@@ -76,7 +87,7 @@ class TwitchAPIMixin(object):
 
         if response.status_code == 429:
             # try the request again after having executed _wait_for_limit_reset
-            return self._request(path, params=params, method=method)
+            return self._request(path, params=params, method=method, data=data)
         elif response.status_code == 400:
             # we can expect a helpful message from twitch and relay that information
             message = response.json()["message"]
@@ -86,7 +97,11 @@ class TwitchAPIMixin(object):
             raise requests.exceptions.HTTPError(
                 f"{response.status_code} Client Error: Bad Request for url: {response.url}: {message}"
             )
-
+        elif response.status_code == 401:
+            self._refresh_oauth_token()
+            
+            # try again after we refresh our token
+            self._request(path, params=params, method=method, data=data)
         response.raise_for_status()
         return response.json()
 
